@@ -1,0 +1,9 @@
+main1/first/A
+main1/first/C
+main1/second/A/
+main2/first/A
+main2/first/B
+main2/first/C
+main2/second/A/
+main2/second/B/
+main2/second/C/

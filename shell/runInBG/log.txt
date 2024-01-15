@@ -1,0 +1,5 @@
+Starting script
+Compiled. Proceeding to run.
+Starting 50000000 iterations. Prepare for jargon.
+Exiting.
+Done

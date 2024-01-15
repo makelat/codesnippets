@@ -1,0 +1,3 @@
+/home/user/cernbox/codesketch/cmake/cpp_fortran/CMakeFiles/rebuild_cache.dir
+/home/user/cernbox/codesketch/cmake/cpp_fortran/CMakeFiles/testEXE.dir
+/home/user/cernbox/codesketch/cmake/cpp_fortran/CMakeFiles/edit_cache.dir

@@ -1,0 +1,3 @@
+/home/user/cernbox/codesketch/cmake/fortran/CMakeFiles/rebuild_cache.dir
+/home/user/cernbox/codesketch/cmake/fortran/CMakeFiles/greet.dir
+/home/user/cernbox/codesketch/cmake/fortran/CMakeFiles/edit_cache.dir
