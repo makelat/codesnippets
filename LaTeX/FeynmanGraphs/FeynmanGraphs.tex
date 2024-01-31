@@ -1,0 +1,491 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fontenc}
+\usepackage{amsmath}
+\usepackage{parskip}
+\usepackage[pdftex]{graphicx}
+\usepackage{verbatim}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{epstopdf}
+\usepackage{subfig}
+\usepackage{feynmf}
+
+\begin{document}
+
+\begin{fmffile}{FeynmanDiagrams}
+
+%Macro commands for drawing shaded areas, "brown muck":
+\fmfcmd{%
+vardef port (expr t, p) =
+  (direction t of p rotated 90)
+  / abs (direction t of p)
+enddef;}
+\fmfcmd{%
+vardef portpath (expr a, b ,p) =
+  save l; numeric l; l = length p;
+  for t=0 step 0.1 until l+0.05:
+    if t>0: .. fi point t of p
+    shifted ((a+b*sind(180t/l))*port(t,p))
+  endfor
+  if cycle p: .. cycle fi
+enddef;}
+\fmfcmd{%
+style_def brown_muck expr p =
+  shadedraw(portpath(thick/2,2thick,p)
+    ..reverse(portpath(-thick/2,-2thick,p))
+    ..cycle)
+enddef;}	%End of macro command definitions
+
+
+%CEP QED process with two centrally produced muons:
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\subfloat[$pp(\gamma\gamma)$]{
+\begin{fmfgraph*}(3,3)
+\fmfleft{pi1,pi2}		%Protons in
+\fmfright{po1,mu1,mu2,po2}	%Protons and muons out
+%Labels for incoming and outgoing particles:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po2}
+\fmflabel{$\mu$}{mu1}
+\fmflabel{$\mu$}{mu2}
+%Lower proton lines:
+\fmf{fermion}{pi1,pv1}
+\fmf{fermion,tension=.5}{pv1,po1}
+%Upper proton lines:
+\fmf{fermion}{pi2,pv2}
+\fmf{fermion,tension=.5}{pv2,po2}
+\fmffreeze		%Keep proton lines straight
+%Muon lines:
+\fmf{fermion,tension=.5}{mu1,muv1}	%Lower muon out
+\fmf{fermion,tension=1.3}{muv1,muv2}	%Fermion propagator
+\fmf{fermion,tension=.5}{muv2,mu2}	%Upper muon out
+%Virtual photon lines:
+\fmf{photon,label=$\gamma$}{pv1,muv1}
+\fmf{photon,label=$\gamma$}{muv2,pv2}
+\end{fmfgraph*}
+}
+%CEP process involving a gamma and a gluon, producing J/Psi:
+\subfloat[$pp(\gamma g)$]{
+\begin{fmfgraph*}(3,3)
+\fmfset{curly_len}{2mm}
+\fmfleft{pi1,di,pi2}	%d are dummies for better control
+\fmfright{po1,do1,do2,J,do3,do4,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po2}
+\fmflabel{$J/\Psi$}{J}
+\fmflabel{$\Psi(2S)$}{do2}
+%Proton lines:
+\fmf{fermion,tension=2}{pi1,pv1}
+\fmf{fermion,tension=.5}{pv1,po1}
+\fmf{fermion,tension=.5}{pi2,pv2a}
+\fmf{fermion}{pv2a,pv2b,po2}
+%For forming a skeleton for the central system:
+\fmf{phantom,tension=1.5}{di,v1}
+\fmf{phantom}{v1,v3}
+\fmf{phantom,tension=3}{v3,J}
+\fmffreeze
+%Central system:
+\fmf{photon,tension=2}{pv1,v1}
+\fmf{phantom,label=$\gamma$,left=0.01,tension=0}{pv1,v1}
+\fmf{plain,label=$c$,left=.3,tension=1.7}{v1,v2}
+\fmf{gluon,label=$g$,right=.001,tension=1.5}{pv2a,v2}
+\fmf{plain,left=.4}{v2,v3}
+\fmf{gluon,tension=0}{pv2b,v4}
+\fmf{phantom}{v4,po1}
+\fmf{plain,left=.2,tension=1.5}{v3,v4}
+\fmf{plain,label=$\bar{c}$,left=.4}{v4,v1}
+\fmf{phantom,label=$g$,right=.001,tension=0}{v4,v1}
+\fmf{fermion,tension=1.5}{v3,J}
+\end{fmfgraph*}
+}
+~~~~~~
+%CEP process with gluons and blobs, producing chi_c:
+\subfloat[$pp(gg)$]{
+\begin{fmfgraph*}(3,3)
+\fmfset{curly_len}{2mm}
+\fmfleft{pi1,pi2}
+\fmfright{po1,do1,do2,chic,do3,do4,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po2}
+\fmflabel{$\chi_c$,}{do3}
+\fmflabel{jet-jet,}{chic}
+\fmflabel{Higgs}{do2}
+%Proton lines:
+\fmf{fermion}{pi1,pv1}
+\fmf{fermion,tension=.5}{pv1,po1}
+\fmf{fermion}{pi2,pv2}
+\fmf{fermion,tension=.5}{pv2,po2}
+\fmffreeze		%Keep proton lines straight
+%Gluon lines:
+\fmf{gluon,label=$g$,tension=.1}{pv1,pv2}
+\fmf{gluon,label=$g$,tension=.5}{vCenter,pv1}
+\fmf{gluon,label=$g$,tension=.5}{vCenter,pv2}
+%Centrally produced system:
+\fmf{fermion}{vCenter,chic}
+%Replace vertices with blobs:
+\fmfblob{.15w}{pv1}
+\fmfblob{.15w}{pv2}
+\fmfblob{.15w}{vCenter}
+\end{fmfgraph*}
+}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%"First workaround" to do the loop of the middle figure above,
+%just for future trick reference
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3,3)
+\fmfleft{pi1,dummy,pi2}
+\fmfright{po1,do1,do2,J,do3,do4,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{po2}
+\fmflabel{$J/\Psi$,}{J}
+\fmflabel{$\Psi(2S)$}{do2}
+%Proton lines:
+\fmf{fermion}{pi1,pv1a}
+\fmf{plain}{pv1a,pv1b}
+\fmf{fermion}{pv1b,pv1c}
+\fmf{plain,tension=.7}{pv1c,po1}
+\fmf{fermion}{pi2,pv2a}
+\fmf{plain,tension=2.3}{pv2a,pv2b}
+\fmf{fermion}{pv2b,pv2c}
+\fmf{fermion,tension=.7}{pv2c,po2}
+\fmffreeze		%Keep proton lines straight
+%Charm quark loop:
+\fmf{plain,left}{c1,c2,c1}
+\fmf{phantom,tension=3}{dummy,c1}
+%Bosons to quark loop:
+\fmf{photon,tension=0}{pv1a,c1}
+\fmf{phantom,tension=1}{pv1b,gv1}
+\fmf{gluon,label=$g$,tension=2.25}{gv1,pv2b}
+\fmf{phantom,tension=2}{pv1c,gv2}
+\fmf{gluon,label=$g$,tension=.73}{gv2,pv2c}
+%Phantom lines just to correct label placement:
+\fmf{phantom,label=$\bar{c}$,tension=3}{pi2,clabel}
+\fmf{phantom,label=$c$,tension=5}{clabel,pv1b}
+\fmf{phantom,tension=3}{pv2a,gammalabel}
+\fmf{phantom,label=$\gamma$,tension=5}{gammalabel,pv1a}
+%J/Psi out:
+\fmf{fermion,tension=5}{c2,J}
+\end{fmfgraph*}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\subfloat[bare]{
+\begin{fmfgraph*}(3,3)
+\fmfleft{di1,pi1,di2,pi2,di3}
+\fmfright{po1,Vo,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p_1$}{pi1}
+\fmflabel{$p_1$}{po1}
+\fmflabel{$p_2$}{pi2}
+\fmflabel{$p_2$}{po2}
+\fmflabel{$V$}{Vo}
+%Proton lines:
+\fmf{fermion}{pi1,pv1,po1}
+\fmf{fermion}{pi2,pv2,po2}
+%Central system:
+\fmf{photon,tension=1.5}{pv1,v}
+\fmf{brown_muck}{pv2,v}
+\fmf{dbl_plain_arrow}{v,Vo}
+%Replace central system vertex with dot:
+\fmfdot{v}
+\end{fmfgraph*}
+}
+~~~~~~~
+\subfloat[screened]{
+\begin{fmfgraph*}(3,3)
+\fmfleft{di1,pi1,di2,pi2,di3}
+\fmfright{po1,Vo,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p_1$}{pi1}
+\fmflabel{$p_1$}{po1}
+\fmflabel{$p_2$}{pi2}
+\fmflabel{$p_2$}{po2}
+\fmflabel{$V$}{Vo}
+%Proton lines:
+\fmf{fermion}{pi1,pv1a,pv1b,po1}
+\fmf{fermion}{pi2,pv2a,pv2b,po2}
+%Central system:
+\fmf{photon,tension=1.5}{pv1b,v}
+\fmf{brown_muck}{pv2b,v}
+\fmf{dbl_plain_arrow}{v,Vo}
+\fmffreeze
+%Screening:
+\fmf{brown_muck}{pv1a,pv2a}
+%Replace central system vertex with dot:
+\fmfdot{v}
+\end{fmfgraph*}
+}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 10.1.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\subfloat[bare]{
+\begin{fmfgraph*}(3,3)
+\fmfleft{pi1,pi2}
+\fmfright{po1,lo1,lo2,po2}
+%Proton lines:
+\fmf{fermion}{pi1,pv1,po1}
+\fmf{fermion}{pi2,pv2,po2}
+\fmffreeze
+%Central system:
+\fmf{photon,label=$q_{2X}$}{pv1,v1}
+\fmf{fermion}{v2,v1}
+\fmf{photon,label=$q_{1X}$}{v2,pv2}
+\fmf{fermion,tension=0}{v1,lo1}
+\fmf{fermion,tension=0}{lo2,v2}
+%Blobs:
+\fmfblob{.15w}{pv1}
+\fmfblob{.15w}{pv2}
+\end{fmfgraph*}
+}
+~~~~~
+\subfloat[screened]{
+\begin{fmfgraph*}(3,3)
+\fmfleft{pi1,pi2}
+\fmfright{po1,lo1,lo2,po2}
+%Proton lines:
+\fmf{fermion}{pi1,pv1a,pv1b,po1}
+\fmf{fermion}{pi2,pv2a,pv2b,po2}
+\fmffreeze
+%Central system:
+\fmf{photon,label=$q_{2X}-k_X$}{pv1b,v1}
+\fmf{fermion}{v2,v1}
+\fmf{photon,label=$q_{1X}+k_X$}{pv2b,v2}
+\fmf{fermion}{v1,lo1}
+\fmf{fermion}{lo2,v2}
+%Screening:
+\fmf{phantom,label=$\circlearrowright k_X$}{pv1a,pv2a}
+\fmf{brown_muck,label=$T_{el}(k_X^2)$}{pv2a,pv1a}
+%Blobs:
+\fmfblob{.15w}{pv1b}
+\fmfblob{.15w}{pv2b}
+\end{fmfgraph*}
+}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 2.2.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3,3)
+\fmfset{curly_len}{2mm}
+\fmfleft{pi1,pi2}
+\fmfright{po1,M,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{po2}
+\fmflabel{$M$}{M}
+%Proton lines:
+\fmf{fermion,tension=4}{pi1,pv1}
+\fmf{fermion}{pv1,po1}
+\fmf{fermion,tension=4}{pi2,pv2}
+\fmf{fermion}{pv2,po2}
+%Central system:
+\fmf{photon,tension=2}{pv1,v1}
+\fmf{fermion}{v1,v2}
+\fmf{photon,tension=2}{v2,pv2}
+\fmf{fermion,tension=.5}{v3,v1}
+\fmf{phantom,tension=.7}{v3,po1}
+\fmf{fermion,tension=.5}{v2,v4}
+\fmf{phantom,tension=.7}{v4,po2}
+\fmf{gluon}{v3,v5}
+\fmf{gluon}{v5,v4}
+\fmf{fermion,tension=0}{v5,M}
+\end{fmfgraph*}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 4.1.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3,3)
+\fmfleft{pi1,pi2}
+\fmfright{po1,W1,W2,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p$}{pi1}
+\fmflabel{$p$}{pi2}
+\fmflabel{$p$}{po1}
+\fmflabel{$p$}{po2}
+\fmflabel{$W^+$}{W1}
+\fmflabel{$W^-$}{W2}
+%Proton lines:
+\fmf{fermion,tension=4}{pi1,pv1}
+\fmf{fermion}{pv1,po1}
+\fmf{fermion,tension=4}{pi2,pv2}
+\fmf{fermion}{pv2,po2}
+%Central system:
+\fmf{photon,label=$\gamma^*$}{v,pv1}
+\fmf{photon,label=$\gamma^*$}{pv2,v}
+\fmf{zigzag}{v,W1}
+\fmf{zigzag}{v,W2}
+%Blob:
+\fmfblob{.15w}{v}
+\end{fmfgraph*}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 7.1.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3,3)
+\fmfset{curly_len}{2mm}
+\fmfleft{d1,g1,d2,g2,d3}	%d = dummies for better control
+\fmfright{psi1,psi2}
+%Incoming and outgoing particle labels:
+\fmflabel{$g_1(\lambda_1)$}{g2}
+\fmflabel{$g_2(\lambda_2)$}{g1}
+\fmflabel{$\psi_1(\lambda_3)$}{psi2}
+\fmflabel{$\psi_2(\lambda_4)$}{psi1}
+%Incoming gluons:
+\fmf{gluon,tension=3}{g1,v1}
+\fmf{gluon,tension=3}{g2,v2}
+%Outer lines:
+\fmf{fermion}{v1,v3,v2}
+\fmf{fermion}{vblob1,v1}
+\fmf{fermion}{v2,vblob2}
+%Central lines:
+\fmf{gluon,tension=0}{v3,v4}
+\fmf{phantom}{v2,v4}
+\fmf{phantom}{v1,v4}
+\fmf{fermion}{v4,vblob1}
+\fmf{fermion}{vblob2,v4}
+%Outgoing psi:
+\fmf{fermion,tension=3}{vblob1,psi1}
+\fmf{fermion,tension=3}{vblob2,psi2}
+%Replace vertices with blobs:
+\fmfblob{.15w}{vblob1}
+\fmfblob{.15w}{vblob2}
+\end{fmfgraph*}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 8.2.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3,3)
+\fmfleft{i1,i2,i3,di1,di2,di3,di4,di5,i4,i5,i6}
+\fmfright{o1,o2,o3,do1,do2,do3,do4,do5,o4,o5,o6}
+%Lower lines:
+\fmf{phantom,tension=2}{i1,v1a}
+\fmf{plain,tension=2}{i2,v2a}
+\fmf{phantom,tension=1.5}{i3,v3a}
+\fmf{plain,tension=.5}{v1a,v1b}
+\fmf{plain,tension=1.5}{v1b,v1c}
+\fmf{plain}{v2a,v2b}
+\fmf{plain}{v2b,v2c}
+\fmf{plain,tension=1.5}{v3a,v3b}
+\fmf{plain,tension=.5}{v3b,v3c}
+\fmf{phantom,tension=2}{v1c,o1}
+\fmf{plain,tension=2}{v2c,o2}
+\fmf{phantom,tension=1.5}{v3c,o3}
+%For making empty space between the protons:
+\fmf{phantom}{di1,do1}
+\fmf{phantom}{di2,do2}
+\fmf{phantom}{di3,do3}
+\fmf{phantom}{di4,do4}
+\fmf{phantom}{di5,do5}
+%Upper lines:
+\fmf{phantom,tension=1.5}{i4,v4a}
+\fmf{plain,tension=2}{i5,v5a}
+\fmf{phantom,tension=2}{i6,v6a}
+\fmf{plain,tension=1.5}{v4a,v4b}
+\fmf{plain,tension=.5}{v4b,v4c}
+\fmf{plain}{v5a,v5b}
+\fmf{plain}{v5b,v5c}
+\fmf{plain,tension=.5}{v6a,v6b}
+\fmf{plain,tension=1.5}{v6b,v6c}
+\fmf{phantom,tension=1.5}{v4c,o4}
+\fmf{plain,tension=2}{v5c,o5}
+\fmf{phantom,tension=2}{v6c,o6}
+%Interaction lines:
+\fmf{dashes,tension=0}{v3b,v4b}
+\fmf{dashes,tension=0}{v2b,v5b}
+\fmf{dashes,tension=0}{v1b,v6b}
+%Blobs:
+\fmfblob{.2w}{v2a}
+\fmfblob{.2w}{v5a}
+\fmfblob{.2w}{v2c}
+\fmfblob{.2w}{v5c}
+\end{fmfgraph*}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Fig. 5.1.
+\begin{figure}
+\setlength{\unitlength}{1cm}
+\begin{fmfgraph*}(3.9,3)
+\fmfset{curly_len}{1.5mm}
+\fmfleft{pi1,pi2}
+\fmfright{po1,X,po2}
+%Incoming and outgoing particle labels:
+\fmflabel{$p_1$}{pi2}
+\fmflabel{$p_2$}{pi1}
+\fmflabel{$p_1$}{po2}
+\fmflabel{$p_2$}{po1}
+\fmflabel{$X$}{X}
+%Proton lines:
+\fmf{fermion,tension=2}{pi1,pv1a}
+\fmf{plain,tension=1.5}{pv1a,pv1b}
+\fmf{fermion}{pv1b,pv1c}
+\fmf{brown_muck,tension=0}{pv1c,pv1d}
+\fmf{phantom,tension=1.5}{pv1c,pv1c2}
+\fmf{phantom,tension=1.5}{pv1c2,pv1d}
+\fmf{fermion,tension=1.3}{pv1d,po1}
+\fmf{fermion,tension=2}{pi2,pv2a}
+\fmf{plain,tension=1.5}{pv2a,pv2b}
+\fmf{fermion}{pv2b,pv2c}
+\fmf{phantom,tension=1.5}{pv2c,pv2c2}
+\fmf{phantom,tension=1.5}{pv2c2,pv2d}
+\fmf{brown_muck,tension=0}{pv2c,pv2d}
+\fmf{fermion,tension=1.3}{pv2d,po2}
+%Screening and labeling:
+\fmf{brown_muck,label=$S_{eik}$,tension=0}{pv2a,pv1a}
+\fmf{brown_muck,label=$S_{enh}$,left=0.0001,tension=0}{pv1b,pv2c2}
+\fmffreeze
+%Skeleton for gluon ladder:
+%LHS:
+\fmf{phantom}{pv1c,lad1a}
+\fmf{phantom}{lad1a,lad1b}
+\fmf{phantom,label=$\circlearrowright Q_\perp$}{lad1b,vcCenter}
+\fmf{phantom}{pv2c,lad1d}
+\fmf{phantom}{lad1d,lad1c}
+\fmf{phantom}{lad1c,vcCenter}
+%RHS:
+\fmf{phantom}{pv1d,lad2a}
+\fmf{phantom}{lad2a,lad2b}
+\fmf{phantom}{lad2b,vcenter}
+\fmf{phantom}{pv2d,lad2d}
+\fmf{phantom}{lad2d,lad2c}
+\fmf{phantom}{lad2c,vcenter}
+%Centrally produced system:
+\fmf{fermion}{vcenter,X}
+%Gluon ladder:
+\fmf{gluon,tension=0}{pv1c,pv2c}	%LHS vertical gluon line
+\fmf{gluon,label=$x_2$,tension=0}{pv1d,vcenter}	%RHS lower "-||-"
+\fmf{gluon,label=$x_1$,tension=0}{vcenter,pv2d} %RHS upper "-||-"
+\fmf{gluon,tension=0}{lad1a,lad2a}	%Rungs of the ladder->
+\fmf{gluon,tension=0}{lad1b,lad2b}
+\fmf{gluon,tension=0}{lad1c,lad2c}
+\fmf{gluon,tension=0}{lad1d,lad2d}
+%Central system blob:
+\fmfblob{.12w}{vcenter}
+\end{fmfgraph*}
+\end{figure}
+
+\end{fmffile}
+\end{document}
