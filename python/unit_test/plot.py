@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def plotTest(plotdata,testtag,testsubdir=''):
+def plotTest(plotdata,testtag,testsubdir='',mode='plot'):
     
     #Ensure relevant test directory structure exists
     testdir = 'tests/'+testsubdir
@@ -30,10 +30,15 @@ def plotTest(plotdata,testtag,testsubdir=''):
         ref=''
     
     #Write x and y axes's data to output file, one column for each
-    #TODO plotdata output is assumed to be from a simple plt.plot here.
-    #     Will be different for e.g. histograms or multidimensional plots
     f = open(outputpath+ref+suffix,"w")
-    plotdataT = np.array(plotdata[-1].get_data()).T
+    plotdataT = plotdata
+    if mode == 'plot': plotdataT = np.array(plotdata[-1].get_data()).T
+    elif mode == 'histo':
+        binslo = plotdata[1][:-1]
+        binshi = plotdata[1][1:]
+        vals   = plotdata[0]
+        plotdataT = [binslo, binshi, vals]
+        print('plotdataT',plotdataT)
     for vec in plotdataT:
         for x in vec:
             f.write(str(x)+"    ")
@@ -42,13 +47,15 @@ def plotTest(plotdata,testtag,testsubdir=''):
 
     #If a reference file already exists, compare this output to that    
     if not initmode:
-        print('TODO')
         xref = np.loadtxt(outputpath + '_REFERENCE' + suffix, usecols=0)
         yref = np.loadtxt(outputpath + '_REFERENCE' + suffix, usecols=1)
         x    = np.loadtxt(outputpath                + suffix, usecols=0)
         y    = np.loadtxt(outputpath                + suffix, usecols=1)
-        #TODO here we check exact agreement, works for ints.
-        #     Floats would require a simple tolerance criterion
+        tol=0.001
+        xagree = sum([x[i]*(1.0+tol)>xref[i] and x[i]*(1.0-tol)<xref[i]
+                      for i in range(len(x))])
+        yagree = sum([y[i]*(1.0+tol)>yref[i] and y[i]*(1.0-tol)<yref[i]
+                      for i in range(len(y))])
         xagree = sum([x[i] == xref[i] for i in range(len(x))])
         yagree = sum([y[i] == yref[i] for i in range(len(y))])
         if xagree != len(x) or yagree != len(y):
@@ -73,6 +80,14 @@ def plotter():
     #TODO the testtag above must be different for all produced plots.
     #     An example convention is to give tags consisting of dates and test indices:
     #     [date of incorporating test]_[Is this the 1st/2nd/... test implemented today?]
+    #Additional example: a histogram
+    xbins = [0.5*(x[i]+x[i+1]) for i in range(len(x)-1)]
+    print('DEBUG 1')
+    plotTest(plt.hist(bins=xbins,x=x,weights=y,label=r'$y=x^2$'),\
+             testsubdir = 'plot',\
+             testtag = 'test_240212_01',
+             mode='histo')  #Assign an individual output tag
+    print('DEBUG 2')
     
     # Title, axis labels and legend
     # Illustrate adding variable stuff into the label string
