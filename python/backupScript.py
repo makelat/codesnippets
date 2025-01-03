@@ -13,25 +13,36 @@ def isNewer(src,tgt):
     return os.path.getmtime(src) > os.path.getmtime(tgt)
 
 #Recursive function to copy files in a (sub)directory
-def copyRecursion(srcdir,tgtdir):
+#Param  srcdir  The source file direcory to be copied
+#       tgtdir  The destination to copy to
+#       hardcp  Set to True if links are to be followed and hard copies taken
+def copyRecursion(srcdir,tgtdir,hardcp=False):
+
+    #Skip directories that are actually symlinks if hard copies not requested
+    #N.B. islink does not return expected outcome if terminating character is '/'!
+    #The soft links are copied below by copy2, treated as single files
+    if os.path.islink(srcdir[:-1]) and not hardcp: return True
 
     #If no target exists, simply copy the source using shutil
     #Note that shutil requires that the target/destination does not exist
     if not os.path.exists(tgtdir):
-        shutil.copytree(src=srcdir,dst=tgtdir,symlinks=False,ignore=None)
+        shutil.copytree(src=srcdir,dst=tgtdir,symlinks=not hardcp,\
+                        copy_function=copy2,ignore=None)
+        print("Copied "+tgtdir+" using copytree")
+        return True
 
     for item in os.listdir(srcdir):
 
         #Copy subdirectory contents recursively
         if os.path.isdir(srcdir+item):
-            copyRecursion(srcdir+item+"/",tgtdir+item+"/")
+            copyRecursion(srcdir+item+"/",tgtdir+item+"/",hardcp=hardcp)
 
         #If file exists in target, check modification date and copy newer files
-        #However, don't files replaced by links
         if not os.path.exists(tgtdir+item) or isNewer(srcdir+item,tgtdir+item):
-            if os.path.islink(srcdir+item): continue  #Skip links
-            shutil.copy(srcdir+item,tgtdir+item)
-            print("Copied "+tgtdir+item)
+            shutil.copy2(srcdir+item,tgtdir+item,follow_symlinks=hardcp)
+            print("Copied to "+tgtdir+item)
+    
+    return True
 
 if __name__=="__main__":
 
@@ -45,11 +56,12 @@ if __name__=="__main__":
 
     #Specify directories to copy, e.g. ["Documents","Pictures"]
     cpdirs = ["Desktop",\
-              "Documents/",\
-              "Downloads/",\
-              "Music/",\
-              "Pictures",\
-             ]
+              "Documents",\
+              "Downloads",\
+              "Music",\
+              "Pictures"]
+    
+    hardcp=False  #Follow symlinks and back them up as hard copies?
 
     # END user input
 
@@ -63,6 +75,6 @@ if __name__=="__main__":
             except: print("Cannot init target path "+tgtpath)
 
         #Copy files and directories recursively
-        try: copyRecursion(srcdir=srcpath+cpdir,tgtdir=tgtpath+cpdir)
-        except: print("Could not copy source "+srcpath+cpdir)
+        try: copyRecursion(srcdir=srcpath+cpdir,tgtdir=tgtpath+cpdir,hardcp=hardcp)
+        except: print("Could not copy source "+srcpath+cpdir+" to "+tgtpath+cpdir)
 
