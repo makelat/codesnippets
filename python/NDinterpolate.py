@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 xlim=[-2,2]
 ylim=[-3,3]
 
-### Build coarse grid
+### Build fine grid
 d=0.05 #Step size
 x = np.arange(xlim[0],xlim[1],d)  #Values along x axis
 y = np.arange(ylim[0],ylim[1],d)  #    -||-     y axis
@@ -28,7 +28,7 @@ Xa,Ya = np.meshgrid(xa,ya)  # 2D grid for interpolation
 #Interpolate on the fine grid to get points corresponding to approx. grid
 Za = interp(Xa, Ya)
 
-#Plot coarse grid
+#Plot fine grid
 fig = plt.figure(figsize=(10,5))
 ax1 = fig.add_subplot(121, projection='3d')
 ax1.plot_surface(X, Y, Z)
@@ -36,7 +36,7 @@ plt.title('Fine grid')
 plt.xlabel('x')
 plt.ylabel('y')
 
-#Plot fine grid
+#Plot coarse/approximative grid
 ax2 = fig.add_subplot(122, projection='3d')
 ax2.plot_surface(Xa, Ya, Za)
 plt.title('Approx. grid')
